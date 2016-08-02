@@ -27,7 +27,7 @@ class CountBy extends Component {
   render() {
     return (
       <div>
-        <input type='number' value={this.state.count} />
+        <input type='number' value={this.state.count} readOnly />
         <button onClick={this.inc.bind(this)}>Inc by {this.props.by}</button>
       </div>
     );
