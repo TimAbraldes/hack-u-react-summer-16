@@ -4,6 +4,7 @@ export default class BTCSorter extends Component {
   state = {
     isAscending: false,
     pendingCount: 0,
+    lastFetchedCount: 0,
   }
 
   constructor(props) {
@@ -23,7 +24,14 @@ export default class BTCSorter extends Component {
   }
 
   updateCount() {
+    if (this.state.lastFetchedCount === this.state.pendingCount) {
+      return;
+    }
+
     this.props.dataFn(this.state.pendingCount);
+    this.setState({
+      lastFetchedCount: this.state.pendingCount,
+    });
   }
 
   render() {
@@ -56,9 +64,9 @@ export default class BTCSorter extends Component {
               <th>Sum</th>
             </tr>
             {
-              items.map((item) => {
+              items.map((item, index) => {
                 return (
-                  <tr key={window.performance.now()}>
+                  <tr key={index}>
                     <td>{item.contributor_payee}</td>
                     <td>{item.sum}</td>
                   </tr>
