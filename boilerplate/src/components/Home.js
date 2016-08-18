@@ -20,19 +20,18 @@ export default class Home extends Component {
   }
 
   render() {
-    const buttonStyle = {
-      display: this.state.isCreating ? 'none' : 'inherit',
-    };
-
     return (
       <div>
-        <button
-          style={buttonStyle}
-          onClick={() => this.setState({ isCreating: !this.state.isCreating })}>
-          New Article
-        </button>
-
         <CreateArticle
+          initialTitle={''}
+          initialAuthor={''}
+          initialBody={''}
+          buttonText={'New Article'}
+          onToggleCreating={() => {
+            this.setState({
+              isCreating: !this.state.isCreating,
+            });
+          }}
           onCreateArticle={(newArticle) => {
             newArticle.id = this.props.articles.length + 1;
             this.setState({
@@ -42,10 +41,9 @@ export default class Home extends Component {
             this.props.dispatch(createArticleAction(newArticle));
 
           }}
-          isVisible={this.state.isCreating} />
+          isCreating={this.state.isCreating} />
 
         <ArticleLinkList articles={this.props.articles} />
-
       </div>
     );
   }
