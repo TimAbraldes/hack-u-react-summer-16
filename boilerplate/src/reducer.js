@@ -86,6 +86,14 @@ export function createArticleAction(newArticle) {
   };
 }
 
+export function deleteArticle(id) {
+  return (dispatch, getState) => {
+    fetch('http://bloggy.2dot3.com/posts/' + id, {
+      method: 'DELETE',
+    });
+  };
+}
+
 export function editArticleAction(newArticle) {
   return (dispatch, getState) => {
     const data = JSON.stringify(newArticle);

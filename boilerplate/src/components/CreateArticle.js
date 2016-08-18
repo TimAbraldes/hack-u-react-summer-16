@@ -32,13 +32,13 @@ export default class CreateArticle extends Component {
           onClick={e => {
             this.props.onToggleCreating();
           }}>
-          {this.props.buttonText}
+          {this.props.toggleText}
         </button>
         <form
           style={formStyle}
           onSubmit={e => {
             e.preventDefault();
-            this.props.onCreateArticle({
+            this.props.onSubmit({
               title: this.state.title,
               body: this.state.body,
               author: this.state.author,
@@ -72,6 +72,9 @@ export default class CreateArticle extends Component {
               placeholder='Body Content' />
           </div>
           <div>
+            <button onClick={e => {
+              this.props.onToggleCreating();
+            }}>Cancel</button>
             <button type='submit'>Submit!</button>
           </div>
         </form>

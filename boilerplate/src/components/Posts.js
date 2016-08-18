@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import { withRouter } from 'react-router';
 
 import Author from './Author';
 import Content from './Content';
@@ -7,8 +8,9 @@ import ArticleTitle from './ArticleTitle';
 import ArticleBody from './ArticleBody';
 import CreateArticle from './CreateArticle';
 
-import { editArticleAction } from '../reducer';
+import { deleteArticle, editArticleAction } from '../reducer';
 
+@withRouter
 @connect(
   (state, ownProps) => {
     const articleId = ownProps.params.id;
@@ -33,17 +35,21 @@ export default class Posts extends Component {
   render() {
     return (
       <Content key={this.props.article.id}>
+        <button onClick={() => {
+          this.props.dispatch(deleteArticle(this.props.article.id));
+          this.props.router.push('/');
+        }}>{'Delete'}</button>
         <CreateArticle
           initialTitle={this.props.article.title}
           initialAuthor={this.props.article.author}
           initialBody={this.props.article.body}
-          buttonText={'Edit'}
+          toggleText={'Edit'}
           onToggleCreating={() => {
             this.setState({
               isCreating: !this.state.isCreating,
             });
           }}
-          onCreateArticle={(newArticle) => {
+          onSubmit={(newArticle) => {
             newArticle.id = this.props.article.id;
             this.setState({
               isCreating: false,

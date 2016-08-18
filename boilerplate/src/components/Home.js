@@ -26,13 +26,13 @@ export default class Home extends Component {
           initialTitle={''}
           initialAuthor={''}
           initialBody={''}
-          buttonText={'New Article'}
+          toggleText={'New Article'}
           onToggleCreating={() => {
             this.setState({
               isCreating: !this.state.isCreating,
             });
           }}
-          onCreateArticle={(newArticle) => {
+          onSubmit={(newArticle) => {
             newArticle.id = this.props.articles.length + 1;
             this.setState({
               isCreating: false,
