@@ -1,11 +1,18 @@
 import React, { Component } from 'react';
 
 export default class App extends Component {
+  static propTypes = {
+    children: React.PropTypes.node,
+  }
+
+  state = {
+    students: [],
+  };
+
   render() {
     return (
       <div className='container'>
-        <h1>Hello, world!</h1>
-        <p>Let's get funky.</p>
+        { this.props.children }
       </div>
     );
   }
