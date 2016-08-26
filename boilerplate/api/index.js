@@ -1,29 +1,33 @@
 import uuid from 'node-uuid';
 
 export function newStudent(student) {
-  let students;
-  try {
-    students = JSON.parse(localStorage.getItem('_students')) || [];
-  } catch (e) {
-    students = [];
-  }
+  return new Promise((resolve, reject) => {
+    let students;
+    try {
+      students = JSON.parse(localStorage.getItem('_students')) || [];
+    } catch (e) {
+      students = [];
+    }
 
-  if (typeof students !== 'object') {
-    students = [];
-  }
+    if (typeof students !== 'object') {
+      students = [];
+    }
 
-  student.id = uuid.v1();
+    student.id = uuid.v1();
 
-  students = [
-    ...students,
-    student,
-  ];
+    students = [
+      ...students,
+      student,
+    ];
 
-  localStorage.setItem('_students', JSON.stringify(students));
+    localStorage.setItem('_students', JSON.stringify(students));
 
-  return Promise.resolve(students);
+    window.setTimeout(resolve.bind(null, students), 1500);
+  });
 }
 
 export function getStudents() {
-  return Promise.resolve(JSON.parse(localStorage.getItem('_students')) || []);
+  return new Promise((resolve, reject) => {
+    window.setTimeout(resolve.bind(null, JSON.parse(localStorage.getItem('_students')) || []), 1500);
+  });
 }
