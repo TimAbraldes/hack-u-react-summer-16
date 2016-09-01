@@ -18,8 +18,9 @@ const ActionTypes = Object.freeze({
 
 const initialState = Object.freeze({
   newStudentName: '',
+
+  creatingStudent: null,
   students: [],
-  isCreating: false,
   isGetting: false,
 });
 
@@ -28,18 +29,17 @@ export default function reducer(state = initialState, action) {
     case ActionTypes.STUDENT_CREATE_BEGIN:
       return {
         ...state,
-        isCreating: true,
+        creatingStudent: action.payload,
       };
     case ActionTypes.STUDENT_CREATE_SUCCESS:
-      console.log(`student created`);
       return state;
     case ActionTypes.STUDENT_CREATE_FAIL:
-      console.log(`student creation failed: ${action.payload}`);
+      console.error(`student creation failed: ${action.payload}`);
       return state;
     case ActionTypes.STUDENT_CREATE_FINALLY:
       return {
         ...state,
-        isCreating: false,
+        creatingStudent: null,
       };
 
     case ActionTypes.GET_STUDENTS_BEGIN:
@@ -48,10 +48,9 @@ export default function reducer(state = initialState, action) {
         isGetting: true,
       };
     case ActionTypes.GET_STUDENTS_SUCCESS:
-      console.log('got students');
       return state;
     case ActionTypes.GET_STUDENTS_FAIL:
-      console.log(`failed getting students: ${action.payload}`);
+      console.error(`failed getting students: ${action.payload}`);
       return state;
     case ActionTypes.GET_STUDENTS_FINALLY:
       return {
@@ -66,7 +65,6 @@ export default function reducer(state = initialState, action) {
       };
 
     case ActionTypes.SET_STUDENTS:
-      console.log(`Setting students: ${action.payload}`);
       return {
         ...state,
         students: action.payload,
@@ -78,8 +76,9 @@ export default function reducer(state = initialState, action) {
 }
 
 const PrivateActionCreators = Object.freeze({
-  newStudentBegin: () => ({
+  newStudentBegin: (newStudent) => ({
     type: ActionTypes.STUDENT_CREATE_BEGIN,
+    payload: newStudent,
   }),
   newStudentSuccess: () => ({
     type: ActionTypes.STUDENT_CREATE_SUCCESS,
@@ -114,14 +113,14 @@ const PrivateActionCreators = Object.freeze({
 
 export const ActionCreators = Object.freeze({
   submitNewStudent: () => async (dispatch, getState) => {
-    dispatch(PrivateActionCreators.newStudentBegin());
+    const newStudent = {
+      name: getState().newStudentName,
+    };
 
-    console.log(`creating student: ${getState().newStudentName}`);
+    dispatch(PrivateActionCreators.newStudentBegin(newStudent));
 
     try {
-      const returnedStudents = await apiCreateNewStudent({
-        name: getState().newStudentName,
-      });
+      const returnedStudents = await apiCreateNewStudent(newStudent);
       dispatch(PrivateActionCreators.setStudents(returnedStudents));
       dispatch(PrivateActionCreators.newStudentSuccess());
     } catch (e) {
