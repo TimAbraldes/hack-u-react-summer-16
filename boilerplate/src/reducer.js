@@ -1,10 +1,19 @@
-import { newStudent as apiCreateNewStudent, getStudents as apiGetStudents } from '../api';
+import {
+  newStudent as apiCreateNewStudent,
+  getStudents as apiGetStudents,
+  deleteStudent as apiRemoveStudent
+} from '../api';
 
 const ActionTypes = Object.freeze({
   STUDENT_CREATE_BEGIN: 'STUDENT_CREATE_BEGIN',
   STUDENT_CREATE_SUCCESS: 'STUDENT_CREATE_SUCCESS',
   STUDENT_CREATE_FAIL: 'STUDENT_CREATE_FAIL',
   STUDENT_CREATE_FINALLY: 'STUDENT_CREATE_FINALLY',
+
+  STUDENT_REMOVE_BEGIN: 'STUDENT_REMOVE_BEGIN',
+  STUDENT_REMOVE_SUCCESS: 'STUDENT_REMOVE_SUCCESS',
+  STUDENT_REMOVE_FAIL: 'STUDENT_REMOVE_FAIL',
+  STUDENT_REMOVE_FINALLY: 'STUDENT_REMOVE_FINALLY',
 
   NEW_STUDENT_CHANGE_NAME: 'NEW_STUDENT_CHANGE_NAME',
 
@@ -20,6 +29,8 @@ const initialState = Object.freeze({
   newStudentName: '',
 
   creatingStudent: null,
+  removingStudent: null,
+
   students: [],
   isGetting: false,
 });
@@ -40,6 +51,22 @@ export default function reducer(state = initialState, action) {
       return {
         ...state,
         creatingStudent: null,
+      };
+
+    case ActionTypes.STUDENT_REMOVE_BEGIN:
+      return {
+        ...state,
+        removingStudent: action.payload,
+      };
+    case ActionTypes.STUDENT_REMOVE_SUCCESS:
+      return state;
+    case ActionTypes.STUDENT_REMOVE_FAIL:
+      console.error(`student removal failed: ${action.payload}`);
+      return state;
+    case ActionTypes.STUDENT_REMOVE_FINALLY:
+      return {
+        ...state,
+        removingStudent: null,
       };
 
     case ActionTypes.GET_STUDENTS_BEGIN:
@@ -91,6 +118,21 @@ const PrivateActionCreators = Object.freeze({
     type: ActionTypes.STUDENT_CREATE_FINALLY,
   }),
 
+  removeStudentBegin: (id) => ({
+    type: ActionTypes.STUDENT_REMOVE_BEGIN,
+    payload: id,
+  }),
+  removeStudentSuccess: () => ({
+    type: ActionTypes.STUDENT_REMOVE_SUCCESS,
+  }),
+  removeStudentFail: (e) => ({
+    type: ActionTypes.STUDENT_REMOVE_FAIL,
+    payload: e,
+  }),
+  removeStudentFinally: () => ({
+    type: ActionTypes.STUDENT_REMOVE_FINALLY,
+  }),
+
   getStudentsBegin: () => ({
     type: ActionTypes.GET_STUDENTS_BEGIN,
   }),
@@ -112,6 +154,19 @@ const PrivateActionCreators = Object.freeze({
 });
 
 export const ActionCreators = Object.freeze({
+  removeStudent: (studentId) => async (dispatch, getState) => {
+    dispatch(PrivateActionCreators.removeStudentBegin(studentId));
+    try {
+      const returnedStudents = await apiRemoveStudent(studentId);
+      dispatch(PrivateActionCreators.setStudents(returnedStudents));
+      dispatch(PrivateActionCreators.removeStudentSuccess());
+    } catch (e) {
+      dispatch(PrivateActionCreators.removeStudentFail(e));
+    }
+
+    dispatch(PrivateActionCreators.removeStudentFinally());
+  },
+
   submitNewStudent: () => async (dispatch, getState) => {
     const newStudent = {
       name: getState().newStudentName,
